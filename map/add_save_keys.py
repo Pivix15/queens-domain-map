@@ -115,7 +115,9 @@ for z in d['zones']:
                 ld = pr.get('LocationData')
                 if isinstance(ld, dict): keys = ['O' + ld['ObjectName'].split("'")[1]]
             else:
-                keys = ['G' + g2hex(g) for g in pr.get('GUIDs', [])]
+                # Les lézards sont faits après ramassage du sac, pas dès leur mort.
+                prefix = 'T' if p[0] == 'lizard' else 'G'
+                keys = [prefix + g2hex(g) for g in pr.get('GUIDs', [])]
                 keys += inchest.get((level, p[6]), [])
                 if p[0] == 'note' and pr.get('ImportKey'): keys.append('NReadNote_' + pr['ImportKey'])
                 if p[0] == 'unique' and not keys: keys = item_keys(p[4])

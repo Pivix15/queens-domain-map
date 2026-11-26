@@ -417,7 +417,7 @@ canvas.drag { cursor: grabbing; }
   // un défi a plusieurs zones de fin sur la carte : elles se cochent ensemble et comptent une fois
   function twins(z, p) { return p[0] === 'challenge' ? z.pois.filter(function (q) { return q[0] === p[0] && q[4] === p[4]; }) : [p]; }
   function saveUnfound() { try { localStorage.setItem('neasied-unfound', JSON.stringify(unfound)); } catch (e) {} }
-  function key(z, p) { return z.levels[p[5]] + '/' + p[6]; }
+  function key(z, p) { return z.levels[p[5]] + '/' + p[6] + (p[0] === 'lizard' ? '#lizard-bag' : ''); }
   // objets faits d'après la sauvegarde chargée (gardés dans le navigateur)
   var saveDone = {}, saveMeta = null, saveHave = null;
   try { var sv = JSON.parse(localStorage.getItem('neasied-save') || 'null'); if (sv && sv.have) { saveHave = {}; sv.have.forEach(function (k) { saveHave[k] = 1; }); saveMeta = sv.meta || null; } } catch (e) {}
@@ -595,6 +595,7 @@ canvas.drag { cursor: grabbing; }
 
   function matches(p) {   // catégorie + recherche, sans tenir compte de la hauteur
     if (!S.on[p[0]]) return false;
+    if (p[0] === 'lizard' && saveHave && isDone(ZONES[S.zone], p)) return false;
     if (S.q && (p[4] + ' ' + p[6]).toLowerCase().indexOf(S.q) < 0) return false;
     return true;
   }
@@ -791,6 +792,7 @@ canvas.drag { cursor: grabbing; }
   });
 
   // --- lecture de World0.sav (format GVAS d'Unreal Engine 4) ---
+  /*__LIZARD_BAGS__*/
   function readSave(buf) {
     var dv = new DataView(buf), u8 = new Uint8Array(buf), p = 0;
     function i32() { var v = dv.getInt32(p, true); p += 4; return v; }
@@ -814,7 +816,7 @@ canvas.drag { cursor: grabbing; }
       else if (typ === 'BoolProperty') { p += 2; }
       else if (typ === 'ByteProperty' || typ === 'EnumProperty') { fstr(); p += 1; }
       else p += 1;
-      e.off = p; p += size; props[name] = e;
+      e.off = p; e.size = size; p += size; props[name] = e;
     }
     var have = {};
     var st = props.SavableActorStates;
@@ -845,6 +847,7 @@ canvas.drag { cursor: grabbing; }
     });
     // dernier cristal de sauvegarde utilisé : clé 'L<nom>' (même nom que la clé 'O<nom>' du cristal)
     if (props.SavePointID) { p = props.SavePointID.off; var sp = fstr(); if (sp) have['L' + sp.slice(sp.lastIndexOf('.') + 1)] = 1; }
+    LizardBags.apply(buf, props.ItemDrops, have);
     return have;
   }
   function applySave(have, fileName, keep) {

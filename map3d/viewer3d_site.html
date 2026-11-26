@@ -337,6 +337,7 @@ let unfound = {};
 try { unfound = JSON.parse(localStorage.getItem('neasied-unfound') || '{}') || {}; } catch (e) {}
 // sans sauvegarde : le texte d'aide du panneau suffit (comme en 2D)
 // --- lecture de World0.sav : même lecteur que la carte 2D ; le résultat est partagé avec elle ---
+  /*__LIZARD_BAGS__*/
   function readSave(buf) {
   var dv = new DataView(buf), u8 = new Uint8Array(buf), p = 0;
   function i32() { var v = dv.getInt32(p, true); p += 4; return v; }
@@ -360,7 +361,7 @@ try { unfound = JSON.parse(localStorage.getItem('neasied-unfound') || '{}') || {
     else if (typ === 'BoolProperty') { p += 2; }
     else if (typ === 'ByteProperty' || typ === 'EnumProperty') { fstr(); p += 1; }
     else p += 1;
-    e.off = p; p += size; props[name] = e;
+    e.off = p; e.size = size; p += size; props[name] = e;
   }
   var have = {};
   var st = props.SavableActorStates;
@@ -391,6 +392,7 @@ try { unfound = JSON.parse(localStorage.getItem('neasied-unfound') || '{}') || {
   });
   // dernier cristal de sauvegarde utilisé : clé 'L<nom>' (même nom que la clé 'O<nom>' du cristal)
   if (props.SavePointID) { p = props.SavePointID.off; var sp = fstr(); if (sp) have['L' + sp.slice(sp.lastIndexOf('.') + 1)] = 1; }
+  LizardBags.apply(buf, props.ItemDrops, have);
   return have;
 }
 
@@ -710,7 +712,7 @@ $('cf').addEventListener('change', () => {
   updateCounts(); refresh(); renderProg(); selectMarker(m);
 });
 let yMin = -1e9, yMax = 1e9;     // tranche de hauteur affichée (étage choisi)
-function matches(p) { const q = $('q').value.trim().toLowerCase(); return on[p.c] && (!q || p.n.toLowerCase().includes(q)); }
+function matches(p) { const q = $('q').value.trim().toLowerCase(); return on[p.c] && !(p.c === 'lizard' && saveHave && isDone(p)) && (!q || p.n.toLowerCase().includes(q)); }
 function refresh() {
   const hide = $('hideDone').checked;
   markers.forEach(m => m.visible = matches(m.userData) && m.userData.y >= yMin && m.userData.y <= yMax && !(hide && m.userData.done));
@@ -719,7 +721,7 @@ function refresh() {
   // liste des résultats de recherche : un clic amène la caméra sur l'objet
   const q = $('q').value.trim().toLowerCase(), res = $('res'); res.innerHTML = '';
   if (!q) return;
-  const hits = markers.filter(m => m.userData.n.toLowerCase().includes(q)).slice(0, 40);
+  const hits = markers.filter(m => m.userData.n.toLowerCase().includes(q) && !(m.userData.c === 'lizard' && saveHave && isDone(m.userData))).slice(0, 40);
   if (!hits.length) { res.textContent = 'Aucun objet trouvé.'; return; }
   hits.forEach(m => {
     const b = document.createElement('button'); b.type = 'button';

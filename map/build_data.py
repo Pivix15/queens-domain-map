@@ -35,7 +35,7 @@ CATS=[ # id,label,color,default
  ('unique','Armes et objets uniques','#ff7a59',1),('key','Clés et livres','#f2e36b',1),('sci','Pièces du scientifique','#4f8cff',1),('upgrade','Améliorations','#6fe08c',1),('ticket','Tickets resto','#b5f23d',1),
  ('skull','Crânes argentés (Skull Key Relic)','#c9d2de',1),('collect','Collectibles','#ff9ad5',1),('egg','Œufs','#ffb38a',1),('memento','Souvenirs','#d9b8ff',1),('npc','PNJ','#ffffff',1),('note','Notes et tablettes','#c9b48a',1),('rune','Runes des dieux','#e64cf5',1),
  ('flesh','Murs de chair','#e0527a',1),('secret','Murs et portes secrets','#5fd0b8',1),('boss','Boss et ennemis uniques','#ff3b3b',0),
- ('challenge','Zones de défi','#9fb4ff',0),('lizard','Lézards stellaires','#3fb6e8',0),('consum','Consommables et pièces','#b8a24a',0),
+ ('challenge','Zones de défi','#9fb4ff',0),('lizard','Lézards et sacs de butin','#3fb6e8',1),('consum','Consommables et pièces','#b8a24a',0),
  ('enemy','Ennemis','#a05a5a',0),
 ]
 tc=collections.Counter(a['t'] for l in d['levels'] for a in l['actors'])

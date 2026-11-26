@@ -22,6 +22,7 @@ Carte interactive non officielle de **Queen's Domain** : tous les mondes en 2D e
   - mondes voisins à leur vraie place (14 mondes, là où ça reste lisible ; pas sur téléphone) : un clic y vole et l'ouvre ;
   - clic sur un objet pour une vue de dessus ;
   - déplacement au clavier (ZQSD ou WASD, A/E ou Q/E, R/F).
+- **Lézards et sacs de butin** : les 36 lézards ont une catégorie dédiée, activée par défaut. Avec une sauvegarde, seuls restent les lézards encore vivants et ceux dont le sac est encore au sol, en 2D comme en 3D.
 - Recherche, filtres par catégorie et option « Masquer ce qui est déjà fait ». Les réglages sont gardés d'une zone à l'autre.
 - **En français et en anglais** : `index.html` / `3d.html` et `en.html` / `3d-en.html`.
 
@@ -66,6 +67,7 @@ deploy/                .htaccess (https, cache), favicon.svg, favicon.ico, apple
 | `SavableActorStates` | `G<guid>` | objets ramassés, coffres ouverts, murs ouverts, boss vaincus |
 | `NamedSaveData` | `N<nom>` | notes lues, quêtes, défis |
 | `InventoryContents`, `Equipment`, `WeaponLevels`… | `I<objet>` | objets possédés, même obtenus autrement |
+| `SavableActorStates` + `ItemDrops` | `T<guid>` | sacs de lézards ramassés : ennemi vaincu et aucun sac restant à son point d’apparition |
 | `KilledEnemyCounts` | `K<fiche>` | bestiaire |
 | `UnlockedTeleporters`, `SavePointsVisited` | `O<nom>` | téléporteurs et cristaux de sauvegarde |
 
@@ -139,6 +141,12 @@ Save location on PC: `%LOCALAPPDATA%\QueensDomain\Saved\SaveGames\<your Steam ID
 ### Repository
 
 This repository contains **code only**, **no game files**. To rebuild the map, export the files from your own copy of the game with [FModel](https://fmodel.app), then follow the steps in [Régénérer la carte](#régénérer-la-carte). The commands are the same in any language.
+
+**Lizards & loot bags:** all 36 loot-dropping lizards have a dedicated category, enabled by default. Loading a save keeps only living lizards and those with a bag still on the ground, in both 2D and 3D. Each spawn has its own save GUID; killing one variant does not complete every lizard of that kind.
+
+The shared `map/lizard_bags.js` reader matches persisted bags to the nearest spawn of the same variant within 15 metres. If a bag cannot be matched, it conservatively keeps that variant’s candidates visible. Generated pages embed this helper through `assemble.py` and `make_3d_html.py`. Rebuild 3D zone data with `place3d.py` as well, to refresh marker IDs and save keys.
+
+Run `node --test tests/lizard_bags.test.js` for regression tests. Set `QD_TEST_SAVE` to a local save path to also check the supplied save with both readers and the 2D filter. Save files are not included in the repository.
 
 The save reader (`readSave` in `map/template.html`) parses the GVAS format (Unreal Engine 4) and matches five lists against each item's keys in `data.json`: `G` (actor states), `N` (named data), `I` (inventory), `K` (bestiary), `O` (teleporters and save points).
 

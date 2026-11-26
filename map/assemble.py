@@ -31,7 +31,8 @@ def main():
         meta['dir'] = 'tiles/%s/' % z['id']
         z['plan'] = meta
         print('%-18s %d étages (%d avant fusion), %d images' % (z['id'], len(meta['floors']), n, len(meta['bands'])))
-    t = open('template.html', encoding='utf-8').read()
+    from lizard_bags import inline_lizard_bags
+    t = inline_lizard_bags(open('template.html', encoding='utf-8').read(), d)
     for lang in ('fr', 'en'):
         build(d, t, lang)
 

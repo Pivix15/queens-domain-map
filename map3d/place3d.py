@@ -16,10 +16,10 @@ for zid in order:
     pts = [p for p in dz['pois']]
     if len(pts) == len(z['pois']):
         for q, p in zip(z['pois'], pts):
-            q['id'] = dz['levels'][p[5]] + '/' + p[6]; q['k'] = p[7] if len(p) > 7 else []; q['c'] = p[0]; q['n'] = p[4]
+            q['id'] = dz['levels'][p[5]] + '/' + p[6] + ('#lizard-bag' if p[0] == 'lizard' else ''); q['k'] = p[7] if len(p) > 7 else []; q['c'] = p[0]; q['n'] = p[4]
     else:   # data.json a changé depuis la génération : on reprend les objets depuis data.json
         z['pois'] = [{'c': p[0], 'x': p[1] / 100, 'y': p[3] / 100, 'z': p[2] / 100, 'n': p[4], 'k': p[7] if len(p) > 7 else [],
-                      'id': dz['levels'][p[5]] + '/' + p[6]} for p in pts]
+                      'id': dz['levels'][p[5]] + '/' + p[6] + ('#lizard-bag' if p[0] == 'lizard' else '')} for p in pts]
     z['cats'] = data['cats']; z['zone'] = dz['label']
     mp = ROOT + '/map/site/tiles/%s/meta.json' % zid
     if os.path.exists(mp):

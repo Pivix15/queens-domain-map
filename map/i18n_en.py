@@ -17,7 +17,7 @@ CATS = {
     'key': 'Keys & books', 'sci': "Scientist's parts", 'upgrade': 'Upgrades', 'ticket': 'Meal tickets', 'skull': 'Silver skulls (Skull Key Relic)',
     'collect': 'Collectibles', 'egg': 'Eggs', 'memento': 'Mementos', 'energy': 'Energy cells', 'bestiaire': 'Bestiary (1 per creature)', 'npc': 'NPCs',
     'note': 'Notes & tablets', 'rune': 'God runes', 'flesh': 'Flesh walls', 'secret': 'Secret walls & doors', 'boss': 'Bosses & unique enemies',
-    'challenge': 'Challenge zones', 'lizard': 'Star lizards', 'consum': 'Consumables & coins', 'enemy': 'Enemies',
+    'challenge': 'Challenge zones', 'lizard': 'Lizards & loot bags', 'consum': 'Consumables & coins', 'enemy': 'Enemies',
 }
 POI = [  # noms d'objets : seules quelques étiquettes ajoutées par le site sont en français
     (r' \(dans un coffre\)', ' (in a chest)'), (r'^Coffre : ', 'Chest: '), (r'^Coffre$', 'Chest'), (r' \(piège\)', ' (trap)'),
