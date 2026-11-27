@@ -34,8 +34,8 @@ CATS=[ # id,label,color,default
  ('save','Cristaux de sauvegarde','#7fe3ff',1),('tp','Téléporteurs','#b79bff',1),('chest','Coffres','#ffc24a',1),
  ('unique','Armes et objets uniques','#ff7a59',1),('key','Clés et livres','#f2e36b',1),('sci','Pièces du scientifique','#4f8cff',1),('upgrade','Améliorations','#6fe08c',1),('ticket','Tickets resto','#b5f23d',1),
  ('skull','Crânes argentés (Skull Key Relic)','#c9d2de',1),('collect','Collectibles','#ff9ad5',1),('egg','Œufs','#ffb38a',1),('memento','Souvenirs','#d9b8ff',1),('npc','PNJ','#ffffff',1),('note','Notes et tablettes','#c9b48a',1),('rune','Runes des dieux','#e64cf5',1),
- ('flesh','Murs de chair','#e0527a',1),('secret','Murs et portes secrets','#5fd0b8',1),('boss','Boss et ennemis uniques','#ff3b3b',0),('challenge','Défis à atteindre','#9fb4ff',0),
- ('lizard','Lézards stellaires','#3fb6e8',0),('consum','Consommables et pièces','#b8a24a',0),
+ ('flesh','Murs de chair','#e0527a',1),('secret','Murs et portes secrets','#5fd0b8',1),('boss','Boss et ennemis uniques','#ff3b3b',0),
+ ('challenge','Zones de défi','#9fb4ff',0),('lizard','Lézards stellaires','#3fb6e8',0),('consum','Consommables et pièces','#b8a24a',0),
  ('enemy','Ennemis','#a05a5a',0),
 ]
 tc=collections.Counter(a['t'] for l in d['levels'] for a in l['actors'])
@@ -61,7 +61,7 @@ def cat(t,p):
     if re.search(r'(^|_)Chest(_|$)',t) and 'Charm' not in t: return 'chest'
     if t=='NecroWall_Manager_BP_C': return 'flesh'
     if t in('SecretWall_C','ScienceSecretWall_C') or re.search(r'SecretZoneDoor|SecretSkull|SecretTeleporter',t): return 'secret'
-    if t=='ChallengeCompleteVolume_C': return 'challenge'   # défis « atteindre un endroit difficile » (succès du 100 %)
+    if t=='ChallengeCompleteVolume_C': return 'challenge'
     if re.search(r'Oldnotes|SmallTablet|^Note$',t): return 'note'
     if (re.search(r'NPC|Shopkeeper',t) or t.endswith('_Ghost_BP_C')) and 'Collision' not in t: return 'npc'   # fantômes du chef, d'En et d'Erma : sans « NPC »
     if t.endswith('Spawner_C') or t.endswith('Spawner_BP_C') or t.endswith('Spawner_Default_C') or 'TrapDecoy' in t or t.startswith('Potion_Lizer'):
@@ -114,7 +114,7 @@ def label(a,c):
         items=[pretty(x.split(':')[0]) for x in p.get('ActorsToActivateOnOpen',[]) if isinstance(x,str) and re.search(r'Pickup|Item|Key|Relic|Fragment|Upgrade',x)]
         return 'Coffre'+(' : '+', '.join(items) if items else '')
     if c=='lizard': k=int(re.search(r'(\d+)',t).group(1)); return '%s (Potion Lizer %02d)'%(LEZARDS[k],k)
-    if c=='challenge': return 'Point à atteindre (défi)'
+    if c=='challenge': return str(p.get('ChallengeToComplete'))
     if c=='flesh': return 'Mur de chair ('+', '.join(x for x in p.get('NamedSaveDataToIncrement',[]) if x!='NecroWallsDestroyed')+')'
     if c=='note':
         ti=p.get('Title'); return (ti.get('SourceString') if isinstance(ti,dict) else None) or 'Note'

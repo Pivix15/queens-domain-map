@@ -13,10 +13,10 @@ sys.path.insert(0, HERE)
 import i18n_en as EN
 
 SITE = 'https://queensdomain.leny15.me/'
-SKIP = {'enemy', 'consum', 'npc', 'lizard', 'challenge'}
+SKIP = {'enemy', 'consum', 'npc', 'lizard'}
 # ordre d'importance pour le résumé des pages (ce que cherchent les joueurs en premier)
 WANTED = ['chest', 'unique', 'skull', 'secret', 'key', 'egg', 'ticket', 'upgrade', 'collect', 'memento', 'rune', 'sci', 'energy', 'save', 'tp',
-          'boss', 'flesh', 'note', 'bestiaire']          # comme la liste « À propos » de la carte : on ne compte pas ce qui revient
+          'boss', 'challenge', 'flesh', 'note', 'bestiaire']          # comme la liste « À propos » de la carte : on ne compte pas ce qui revient
 # mondes qui se touchent et que le jeu charge ensemble (listes de chargement du jeu)
 LINKS = {
     'ile': ['marchand', 'aquatique', 'tour-du-savoir', 'mausolee', 'sz-ruines'],

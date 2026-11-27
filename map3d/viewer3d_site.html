@@ -228,7 +228,7 @@ body.dropping #view::after { content: 'Dépose ta sauvegarde (World0.sav, World1
 <div id="view"><div id="nbLabels"></div><button id="nbOn" type="button" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="hide" d="M4 20 20 4"/></svg><span class="hide">Cacher les mondes voisins</span><span class="show">Afficher les mondes voisins</span></button><svg id="compass" viewBox="-50 -50 100 100" role="img" aria-label="Boussole"><circle r="47" fill="rgba(15,19,29,.82)" stroke="var(--line)"/><g id="rose"><path d="M0-23 7 0H-7Z" fill="var(--gold)"/><path d="M0 23 7 0H-7Z" fill="var(--dim)"/><text class="n" x="0" y="-34" data-dir="n">N</text><text x="34" y="0" data-dir="e">E</text><text x="0" y="34" data-dir="s">S</text><text x="-34" y="0" data-dir="o">O</text></g></svg><section class="prog" id="prog" hidden aria-label="Progression de tous les mondes">
   <div class="ph">
     <div class="row"><h2>Progression</h2><button id="progClose" type="button" aria-label="Fermer">×</button></div>
-    <div class="tot" id="progTot"></div><style>#progTot .reg { margin-top: 4px; font-size: 12.5px; color: var(--dim, #8d95a8); }</style>
+    <div class="tot" id="progTot"></div>
     <div class="bar"><i id="progBar"></i></div>
     <p class="hint" id="progHint"></p>
     <div class="opts">
@@ -885,10 +885,6 @@ function renderProg() {
   if ($('prog').hidden) return;
   const showDone = $('progDone').checked, list = $('progList');
   $('progTot').innerHTML = '<b>' + c.D + ' / ' + c.T + '</b> faits sur tout le jeu · ' + pct(c.D, c.T) + ' %';
-  // défis « atteindre » (succès du 100 %) : un point par défi suffit
-  { const reg = c.zones.filter(r => r.byCat.challenge), regMiss = reg.filter(r => !r.byCat.challenge[0].done);
-    if (reg.length) { const rl = document.createElement('div'); rl.className = 'reg'; rl.textContent = 'Défis atteints : ' + (reg.length - regMiss.length) + ' / ' + reg.length
-      + (regMiss.length ? ' · manquent : ' + regMiss.map(r => r.zl.label).join(', ') : ''); $('progTot').appendChild(rl); } }
   $('progBar').style.width = pct(c.D, c.T) + '%';
   $('progHint').textContent = saveHave ? 'Clique sur un objet pour aller le voir sur la carte.'
     : 'Charge ton World0.sav (panneau de gauche) pour comparer avec ta partie. Sans sauvegarde, seuls les objets cochés « Trouvé » comptent.';

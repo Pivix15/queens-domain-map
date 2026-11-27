@@ -94,9 +94,6 @@ def item_keys(label):
     c = sorted([i for i in ITEMS if lt and lt <= set(_toks(i)) and not i.endswith('_C') and 'Shop' not in i],
                key=lambda i: (len(set(_toks(i)) - lt), len(i)))
     return ['I' + c[0]] if c else []
-# régions (succès du 100 %) : nom tel qu'écrit dans la sauvegarde
-REGIONS = {n.lower(): n for n in ('cha_Area_Prison', 'cha_Area_Lib', 'cha_Area_Maus', 'cha_Area_Aqr', 'cha_Area_Forest', 'cha_Area_Swamp',
-                                  'cha_Area_Aut', 'cha_Area_Castle', 'cha_Area_SG', 'cha_Area_ROS')}
 d = json.load(open('data.json', encoding='utf-8'))
 c = collections.Counter()
 for z in d['zones']:
@@ -108,9 +105,8 @@ for z in d['zones']:
         if p[0] == 'sci':
             k = re.search(r'Unlock_(\d+)', p[6]).group(1)
             keys = ['NWeaponUpgradeUnlock_%02d' % int(k)]     # compte comme fait une fois remise au scientifique
-        elif p[0] == 'challenge':   # le nom affiché est « Point à atteindre (défi) » : la clé vient du portique
-            o = lv.get((z['levels'][p[5]], p[6])); ch = str(((o or {}).get('Properties') or {}).get('ChallengeToComplete')).lower()
-            keys = ['N' + ch, 'N' + REGIONS.get(ch, ch)]   # + l'écriture de la sauvegarde (anciennes sauvegardes gardées par le site)
+        elif p[0] == 'challenge':
+            keys = ['N' + p[4].lower()]
         else:
             level = z['levels'][p[5]]                     # deux niveaux d'une zone peuvent avoir un objet de même nom
             o = lv.get((level, p[6]))

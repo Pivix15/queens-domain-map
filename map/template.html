@@ -326,7 +326,7 @@ canvas.drag { cursor: grabbing; }
   <section class="prog" id="prog" hidden aria-label="Progression de tous les mondes">
     <div class="ph">
       <div class="row"><h2>Progression</h2><button id="progClose" type="button" aria-label="Fermer">×</button></div>
-      <div class="tot" id="progTot"></div><style>#progTot .reg { margin-top: 4px; font-size: 12.5px; color: var(--dim, #8d95a8); }</style>
+      <div class="tot" id="progTot"></div>
       <div class="bar"><i id="progBar"></i></div>
       <p class="hint" id="progHint"></p>
       <div class="opts">
@@ -989,10 +989,6 @@ canvas.drag { cursor: grabbing; }
     if ($('prog').hidden) return;
     var c = progCounts(), showDone = $('progDone').checked, list = $('progList');
     $('progTot').innerHTML = '<b>' + c.D + ' / ' + c.T + '</b> faits sur tout le jeu · ' + pct(c.D, c.T) + ' %';
-    // défis « atteindre » (succès du 100 %) : un point par défi suffit
-    var reg = c.zones.filter(function (r) { return r.byCat.challenge; }), regMiss = reg.filter(function (r) { return !r.byCat.challenge[0].done; });
-    if (reg.length) { var rl = document.createElement('div'); rl.className = 'reg'; rl.textContent = 'Défis atteints : ' + (reg.length - regMiss.length) + ' / ' + reg.length
-      + (regMiss.length ? ' · manquent : ' + regMiss.map(function (r) { return r.z.label; }).join(', ') : ''); $('progTot').appendChild(rl); }
     $('progBar').style.width = pct(c.D, c.T) + '%';
     $('progHint').textContent = saveMeta ? 'Clique sur un objet pour aller le voir sur la carte.'
       : 'Charge ton World0.sav (panneau de gauche) pour comparer avec ta partie. Sans sauvegarde, seuls les objets cochés « Trouvé » comptent.';
