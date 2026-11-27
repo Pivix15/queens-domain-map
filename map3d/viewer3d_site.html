@@ -462,6 +462,7 @@ scene.background = new THREE.Color(0x0f131d);
 const camera = new THREE.PerspectiveCamera(50, 1, 0.3, 5000);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.maxPolarAngle = Math.PI * 0.495;
 scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x3a3326, 1.2));
 const sun = new THREE.DirectionalLight(0xfff1dd, 1.5); sun.position.set(-120, 220, -90); scene.add(sun);
 const lo = new THREE.Vector3(...zone.box.lo), hi = new THREE.Vector3(...zone.box.hi);
@@ -772,23 +773,19 @@ if (fl.length > 1) {
     b.addEventListener('click', () => pickFloor(i));
     $('floors').insertBefore(b, $('fall').nextSibling); btns[i] = b;
   });
-  pickFloor = (i, keepCam) => {
+  // Changer d'étage ne modifie que la coupe et les objets visibles, pas la caméra.
+  pickFloor = i => {
     [$('fall'), ...btns].forEach(b => b.classList.remove('on'));
-    if (i < 0) { $('fall').classList.add('on'); yMin = -1e9; yMax = 1e9; setCut(1e6); sectionOn = false; controls.maxPolarAngle = Math.PI * 0.495; }
+    if (i < 0) { $('fall').classList.add('on'); yMin = -1e9; yMax = 1e9; setCut(1e6); sectionOn = false; }
     else {
       btns[i].classList.add('on'); const f = fl[i];
       yMin = i === 0 ? -1e9 : f.z0 - 0.5;
       yMax = i === fl.length - 1 ? 1e7 : f.z1;          // 1e7 : sans limite, mais sous 1e8, qui veut dire vue d'ensemble
       setCut(f.z1 - 0.2);
-      controls.maxPolarAngle = 0.85;                    // sur un étage : on peut incliner pour le relief, la vue reste lisible
-      if (!keepCam) {                                   // vue de dessus de l'étage, comme un plan
-        const c = modelBox.getCenter(new THREE.Vector3()), s = modelBox.getSize(new THREE.Vector3());
-        topView(new THREE.Vector3(c.x, f.z0 + 1.2, c.z), Math.max(s.x, s.z) * 0.9);
-      }
     }
     refresh();
   };
-  $('fall').addEventListener('click', () => { pickFloor(-1); frame(false); });
+  $('fall').addEventListener('click', () => pickFloor(-1));
   floorStep = d => { const cur = btns.findIndex(b => b.classList.contains('on')); const n = cur < 0 ? (d > 0 ? 0 : fl.length - 1) : cur + d; if (n >= 0 && n < fl.length) pickFloor(n); };
   setCut(1e6);
 } else { $('fhelp').hidden = true; }
@@ -812,7 +809,7 @@ function topView(t, h) {
 function goTo(m) {
   const p = m.userData, f = floorOf(p);
   if (!on[p.c]) { on[p.c] = true; if (cbs[p.c]) cbs[p.c].checked = true; saveCats(); }
-  if (f >= 0) pickFloor(f, true);
+  if (f >= 0) pickFloor(f);
   const t = new THREE.Vector3(p.x, p.y, p.z);
   const az = new THREE.Vector3().subVectors(camera.position, controls.target); az.y = 0;
   if (az.lengthSq() < 1e-6) az.set(-0.6, 0, 1); az.normalize();
