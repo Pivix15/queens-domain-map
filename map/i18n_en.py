@@ -17,7 +17,7 @@ CATS = {
     'key': 'Keys & books', 'sci': "Scientist's parts", 'upgrade': 'Upgrades', 'ticket': 'Meal tickets', 'skull': 'Silver skulls (Skull Key Relic)',
     'collect': 'Collectibles', 'egg': 'Eggs', 'memento': 'Mementos', 'energy': 'Energy cells', 'bestiaire': 'Bestiary (1 per creature)', 'npc': 'NPCs',
     'note': 'Notes & tablets', 'rune': 'God runes', 'flesh': 'Flesh walls', 'secret': 'Secret walls & doors', 'boss': 'Bosses & unique enemies',
-    'challenge': 'Challenge zones', 'lizard': 'Star lizards', 'consum': 'Consumables & coins', 'enemy': 'Enemies',
+    'challenge': 'Reach challenges', 'lizard': 'Star lizards', 'consum': 'Consumables & coins', 'enemy': 'Enemies',
 }
 POI = [  # noms d'objets : seules quelques étiquettes ajoutées par le site sont en français
     (r' \(dans un coffre\)', ' (in a chest)'), (r'^Coffre : ', 'Chest: '), (r'^Coffre$', 'Chest'), (r' \(piège\)', ' (trap)'),
@@ -31,7 +31,7 @@ POI = [  # noms d'objets : seules quelques étiquettes ajoutées par le site son
     (r'^Ticket resto', 'Meal ticket'), (r'^Souvenir \(', 'Memento ('),
     (r'^Rune de Jigeki', 'Jigeki rune'), (r'^Rune de Puwema', 'Puwema rune'),
     (r'^Rune de Sipeha', 'Sipeha rune'), (r'^Rune de Wodaso', 'Wodaso rune'),
-    (r'^Pièce du scientifique n°', "Scientist's part #"), (r'^Zone de défi', 'Challenge zone'),
+    (r'^Pièce du scientifique n°', "Scientist's part #"), (r'^Zone de défi', 'Challenge zone'), (r'^Point à atteindre \(défi\)$', 'Point to reach (challenge)'),
     # lézards stellaires : nom du bestiaire en français, nom interne en anglais
     (r'^Lézard\ stellaire \(Potion Lizer 01\)$', 'Potion Lizer 01'),
     (r'^Lézard\ stellaire\ aquatique \(Potion Lizer 02\)$', 'Potion Lizer 02'),
@@ -51,6 +51,7 @@ DESC3_FR = "Explore Queen's Domain en 3D : chaque monde avec ses étages, ses co
 DESC3_EN = "Explore Queen's Domain in 3D: every world with its floors, chests, silver skulls and secrets. Click an item to see it from above."
 
 COMMON = [
+    ("'Défis atteints : '", "'Challenges reached: '"), ("' · manquent : '", "' · missing: '"),
     ('<span>Dernière sauvegarde : </span>', '<span>Last save: </span>'), ("' · dernière sauvegarde'", "' · last save'"),
     ('<html lang="fr">', '<html lang="en">'),
     ('<meta property="og:locale" content="fr_FR">', '<meta property="og:locale" content="en_GB">'),

@@ -94,19 +94,23 @@ def item_keys(label):
     c = sorted([i for i in ITEMS if lt and lt <= set(_toks(i)) and not i.endswith('_C') and 'Shop' not in i],
                key=lambda i: (len(set(_toks(i)) - lt), len(i)))
     return ['I' + c[0]] if c else []
+# régions (succès du 100 %) : nom tel qu'écrit dans la sauvegarde
+REGIONS = {n.lower(): n for n in ('cha_Area_Prison', 'cha_Area_Lib', 'cha_Area_Maus', 'cha_Area_Aqr', 'cha_Area_Forest', 'cha_Area_Swamp',
+                                  'cha_Area_Aut', 'cha_Area_Castle', 'cha_Area_SG', 'cha_Area_ROS')}
 d = json.load(open('data.json', encoding='utf-8'))
 c = collections.Counter()
 for z in d['zones']:
     for p in z['pois']:
         if p[0] == 'bestiaire': continue                 # clés posées par add_bestiary.py
         del p[7:]
-        if p[0] == 'enemy': continue                      # les ennemis réapparaissent : rien à cocher
+        if p[0] in ('enemy', 'lizard'): continue          # ennemis et lézards réapparaissent : rien à cocher
         keys = []
         if p[0] == 'sci':
             k = re.search(r'Unlock_(\d+)', p[6]).group(1)
             keys = ['NWeaponUpgradeUnlock_%02d' % int(k)]     # compte comme fait une fois remise au scientifique
-        elif p[0] == 'challenge':
-            keys = ['N' + p[4].lower()]
+        elif p[0] == 'challenge':   # le nom affiché est « Point à atteindre (défi) » : la clé vient du portique
+            o = lv.get((z['levels'][p[5]], p[6])); ch = str(((o or {}).get('Properties') or {}).get('ChallengeToComplete')).lower()
+            keys = ['N' + ch, 'N' + REGIONS.get(ch, ch)]   # + l'écriture de la sauvegarde (anciennes sauvegardes gardées par le site)
         else:
             level = z['levels'][p[5]]                     # deux niveaux d'une zone peuvent avoir un objet de même nom
             o = lv.get((level, p[6]))
@@ -118,6 +122,8 @@ for z in d['zones']:
                 keys = ['G' + g2hex(g) for g in pr.get('GUIDs', [])]
                 keys += inchest.get((level, p[6]), [])
                 if p[0] == 'note' and pr.get('ImportKey'): keys.append('NReadNote_' + pr['ImportKey'])
+                # tablette : le texte lu est l'InspectText posé dessus (les 4 des gargouilles n'ont pas de clé à elles)
+                if p[0] == 'note' and (level, p[6]) == ('300_LIB', 'SmallTablet_00_BP7'): keys.append('NReadNote_lib0003')
                 if p[0] == 'unique' and not keys: keys = item_keys(p[4])
                 if p[0] in ('secret', 'mech') and (pr.get('ActivatableMode') or not keys):
                     opening = condition(level, p[6]) or trigger_keys(level, p[6])
@@ -186,6 +192,9 @@ for z in d['zones']:
         at = (z['levels'][p[5]], p[6])
         if p[0] == 'memento': keys = MKEYS[GHOSTS[(at[0], p[6][:-len('_Souvenir')])]]
         elif p[0] == 'npc' and at in GHOSTS: keys = MKEYS[GHOSTS[at]]
+        # Umbada, devant et derrière le comptoir : première discussion
+        elif p[0] == 'npc' and at in (('140_GR_ShopIsleOnly', 'Merchant_Idle_Shop_5'), ('140_GR_ShopIsleOnly', 'Shopkeeper')):
+            keys = ['NShopKeepPostFirstTime', 'NMerchantDidShopDoorComment']
         elif p[0] == 'npc' and at in ALIVE: keys = [ALIVE[at]] + (['NFishwifeGhostTalked'] if p[6] == 'Fishwife_NPC_BP_2' else [])
         else: continue
         del p[7:]; p.append(list(keys)); c[p[0]] += 1

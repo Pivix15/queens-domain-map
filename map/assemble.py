@@ -47,7 +47,7 @@ def build(d, t, lang):
             for p in z['pois']: p[4] = EN.poi_name(p[4])
         t = EN.page_2d(t)
     cnt = Counter(p[0] for z in d['zones'] for p in z['pois'])
-    skip = {'enemy', 'consum', 'npc', 'lizard'}
+    skip = {'enemy', 'consum', 'npc', 'lizard', 'challenge'}
     word = 'items' if lang == 'en' else 'objets'
     pages = 'worlds/' if lang == 'en' else 'mondes/'   # une page fixe par monde (pages_seo.py)
     zl = ''.join('<li><a href="%s%s.html">%s</a> (%d %s)</li>' % (pages, z['id'], _h.escape(z['label']), sum(1 for p in z['pois'] if p[0] not in skip), word) for z in d['zones'])

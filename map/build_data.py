@@ -34,8 +34,8 @@ CATS=[ # id,label,color,default
  ('save','Cristaux de sauvegarde','#7fe3ff',1),('tp','Téléporteurs','#b79bff',1),('chest','Coffres','#ffc24a',1),
  ('unique','Armes et objets uniques','#ff7a59',1),('key','Clés et livres','#f2e36b',1),('sci','Pièces du scientifique','#4f8cff',1),('upgrade','Améliorations','#6fe08c',1),('ticket','Tickets resto','#b5f23d',1),
  ('skull','Crânes argentés (Skull Key Relic)','#c9d2de',1),('collect','Collectibles','#ff9ad5',1),('egg','Œufs','#ffb38a',1),('memento','Souvenirs','#d9b8ff',1),('npc','PNJ','#ffffff',1),('note','Notes et tablettes','#c9b48a',1),('rune','Runes des dieux','#e64cf5',1),
- ('flesh','Murs de chair','#e0527a',1),('secret','Murs et portes secrets','#5fd0b8',1),('boss','Boss et ennemis uniques','#ff3b3b',0),
- ('challenge','Zones de défi','#9fb4ff',0),('lizard','Lézards stellaires','#3fb6e8',0),('consum','Consommables et pièces','#b8a24a',0),
+ ('flesh','Murs de chair','#e0527a',1),('secret','Murs et portes secrets','#5fd0b8',1),('boss','Boss et ennemis uniques','#ff3b3b',0),('challenge','Défis à atteindre','#9fb4ff',0),
+ ('lizard','Lézards stellaires','#3fb6e8',0),('consum','Consommables et pièces','#b8a24a',0),
  ('enemy','Ennemis','#a05a5a',0),
 ]
 tc=collections.Counter(a['t'] for l in d['levels'] for a in l['actors'])
@@ -61,7 +61,7 @@ def cat(t,p):
     if re.search(r'(^|_)Chest(_|$)',t) and 'Charm' not in t: return 'chest'
     if t=='NecroWall_Manager_BP_C': return 'flesh'
     if t in('SecretWall_C','ScienceSecretWall_C') or re.search(r'SecretZoneDoor|SecretSkull|SecretTeleporter',t): return 'secret'
-    if t=='ChallengeCompleteVolume_C': return 'challenge'
+    if t=='ChallengeCompleteVolume_C': return 'challenge'   # défis « atteindre un endroit difficile » (succès du 100 %)
     if re.search(r'Oldnotes|SmallTablet|^Note$',t): return 'note'
     if (re.search(r'NPC|Shopkeeper',t) or t.endswith('_Ghost_BP_C')) and 'Collision' not in t: return 'npc'   # fantômes du chef, d'En et d'Erma : sans « NPC »
     if t.endswith('Spawner_C') or t.endswith('Spawner_BP_C') or t.endswith('Spawner_Default_C') or 'TrapDecoy' in t or t.startswith('Potion_Lizer'):
@@ -93,6 +93,10 @@ PORTES={('420_MAUS_mid','SecretWall22'):'Porte secrète (runes des 4 dieux)',
 # noms du bestiaire des Potion_Lizer_0N (dans l'ordre du bestiaire)
 LEZARDS={1:'Lézard stellaire',2:'Lézard stellaire aquatique',3:'Lézard stellaire érudit',4:'Lézard stellaire des tombes',
          5:'Lézard stellaire des profondeurs',6:'Lézard stellaire majestueux',7:'Lézard stellaire reluisant'}
+# tablettes : leur texte est sur un InspectText posé dessus ; nom de ce texte (niveau, tablette)
+TABLETTES={('300_LIB','SmallTablet_00_BP7'):'Mysterious Grave Tablet',('310_LIB_exterior','SmallTablet_00_BP4'):"Gargoyle's Hint I",
+           ('310_LIB_exterior','SmallTablet_00_BP5'):"Gargoyle's Hint II",('310_LIB_exterior','SmallTablet_00_BP2'):"Gargoyle's Hint III",
+           ('310_LIB_exterior','SmallTablet_00_BP_18'):"Gargoyle's Tablet"}
 def pretty(t):
     s=re.sub(r'_C$','',t); s=re.sub(r'(_BP\d*|_Bp|_PickupBP|_Pickup\d*|_ItemBP|_Item_BP|_Item_Bp|_Item|_Spawner_BP|_Spawner|_NPC|_Data|_Inspect)(?=_|$)','',s)
     s=re.sub(r'_BP\d*$','',s); s=s.replace('_',' ')
@@ -110,7 +114,7 @@ def label(a,c):
         items=[pretty(x.split(':')[0]) for x in p.get('ActorsToActivateOnOpen',[]) if isinstance(x,str) and re.search(r'Pickup|Item|Key|Relic|Fragment|Upgrade',x)]
         return 'Coffre'+(' : '+', '.join(items) if items else '')
     if c=='lizard': k=int(re.search(r'(\d+)',t).group(1)); return '%s (Potion Lizer %02d)'%(LEZARDS[k],k)
-    if c=='challenge': return str(p.get('ChallengeToComplete'))
+    if c=='challenge': return 'Point à atteindre (défi)'
     if c=='flesh': return 'Mur de chair ('+', '.join(x for x in p.get('NamedSaveDataToIncrement',[]) if x!='NecroWallsDestroyed')+')'
     if c=='note':
         ti=p.get('Title'); return (ti.get('SourceString') if isinstance(ti,dict) else None) or 'Note'
@@ -146,7 +150,7 @@ for zid,zl,zs,levels in ZONES:
             c=cat(a['t'],a.get('p',{}))
             if (zid,a['n']) in EXCLURE: continue
             if c:
-                lab=PORTES.get((ln,a['n'])) or label(a,c)
+                lab=PORTES.get((ln,a['n'])) or TABLETTES.get((ln,a['n'])) or label(a,c)
                 if a['n'] in inchest and c!='chest': lab+=' (dans un coffre)'
                 # copies inutilisées laissées par les développeurs : jamais ramassables (absentes d'une sauvegarde à 100 %)
                 if c in ('unique','upgrade','collect') and (ln, a['n']) in DEV_LEFTOVERS: continue
