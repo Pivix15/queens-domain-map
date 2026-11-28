@@ -277,7 +277,7 @@ body.dropping #view::after { content: 'Dépose ta sauvegarde (World0.sav, World1
       <ul class="cats" id="cats"></ul>
       <div class="btns"><button id="reset" type="button">Recentrer</button><button id="top" type="button">Vue de dessus</button></div>
     </div>
-    <div class="foot"><p><b>Souris</b> : clic gauche tourner · clic droit déplacer · molette zoom · clic sur un point : vue de dessus sur l'objet<br>
+    <div class="foot"><p><b>Souris</b> : clic gauche tourner · clic droit déplacer · molette zoom · clic sur un point : vue de dessus sur l'objet · clic molette sur un point : fait / pas fait<br>
   <b>Clavier</b> : ZQSD (WASD en QWERTY) ou flèches se déplacer · A / E tourner (Q / E en QWERTY) · R / F zoom · Maj accélère · Espace vue de dessus<span id="fhelp"> · Page préc. / suiv. changer d'étage · Échap tout voir</span></p></div>
     <div class="support"><p>Un problème ou une idée&nbsp;? Contacte <b>Leny15</b> sur Discord&nbsp;:</p><a href="https://discord.gg/n5nVh8qafs" target="_blank" rel="noopener">Rejoindre le Discord</a></div>
   </div>
@@ -698,17 +698,18 @@ function selectMarker(m) {
 // case « Trouvé » : coche un objet à la main, ou décoche un objet que la sauvegarde donne fait à tort
 // un défi a plusieurs zones de fin sur la carte : elles se cochent ensemble et comptent une fois
 function twins(p, pois) { return p.c === 'challenge' ? pois.filter(q => q.c === p.c && q.n === p.n) : [p]; }
-$('cf').addEventListener('change', () => {
-  const m = selected; if (!m) return; const p = m.userData;
+function setMarkerDone(m, done) {
+  if (!m) return; const p = m.userData;
   const group = twins(p, zone.pois);
   for (const q of group) {
-    if ($('cf').checked) { delete unfound[q.id]; if (!bySave(q)) found[q.id] = 1; }
+    if (done) { delete unfound[q.id]; if (!bySave(q)) found[q.id] = 1; }
     else { delete found[q.id]; if (bySave(q)) unfound[q.id] = q.k.filter(hasKey); }
   }
   try { localStorage.setItem('neasied-found', JSON.stringify(found)); localStorage.setItem('neasied-unfound', JSON.stringify(unfound)); } catch (e) {}
   markers.forEach(o => { if (group.includes(o.userData)) { o.material.map = markerTex(o.userData); o.material.needsUpdate = true; } });
   updateCounts(); refresh(); renderProg(); selectMarker(m);
-});
+}
+$('cf').addEventListener('change', () => setMarkerDone(selected, $('cf').checked));
 let yMin = -1e9, yMax = 1e9;     // tranche de hauteur affichée (étage choisi)
 function matches(p) { const q = $('q').value.trim().toLowerCase(); return on[p.c] && (!q || p.n.toLowerCase().includes(q)); }
 function refresh() {
@@ -985,13 +986,30 @@ renderer.domElement.addEventListener('pointermove', ev => {
 });
 renderer.domElement.addEventListener('pointerleave', () => { $('tip').style.display = 'none'; if (neighbours) neighbours.leave(); });
 let downAt = null;
-renderer.domElement.addEventListener('pointerdown', ev => { downAt = [ev.clientX, ev.clientY]; });
+// Capture middle presses on markers before OrbitControls starts its dolly gesture.
+renderer.domElement.addEventListener('pointerdown', ev => {
+  const m = ev.button === 1 ? pick(ev) : null;
+  downAt = { x: ev.clientX, y: ev.clientY, button: ev.button, id: ev.pointerId, marker: m };
+  if (m) { ev.preventDefault(); ev.stopImmediatePropagation(); }
+}, true);
 renderer.domElement.addEventListener('pointerup', ev => {
-  if (!downAt || Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]) > 4) return;
+  const down = downAt;
+  if (!down || down.id !== ev.pointerId) return;
+  downAt = null;
+  if (down.marker) { ev.preventDefault(); ev.stopImmediatePropagation(); }
+  if (down.button !== ev.button || Math.hypot(ev.clientX - down.x, ev.clientY - down.y) > 4) return;
   const m = pick(ev);
-  if (m) goTo(m);
-  else if (neighbours && ev.button === 0) neighbours.click(ev);
-});
+  if (ev.button === 1) {
+    if (m && m === down.marker) setMarkerDone(m, !isDone(m.userData));
+  } else if (ev.button === 0) {
+    if (m) goTo(m);
+    else if (neighbours) neighbours.click(ev);
+  }
+}, true);
+renderer.domElement.addEventListener('pointercancel', () => { downAt = null; });
+// Disable browser autoscroll/auxiliary click while keeping middle-drag dolly on empty space.
+renderer.domElement.addEventListener('mousedown', ev => { if (ev.button === 1) ev.preventDefault(); });
+renderer.domElement.addEventListener('auxclick', ev => { if (ev.button === 1) ev.preventDefault(); });
 $('cx').addEventListener('click', () => selectMarker(null));
 controls.addEventListener('start', () => { fly = null; });
 
